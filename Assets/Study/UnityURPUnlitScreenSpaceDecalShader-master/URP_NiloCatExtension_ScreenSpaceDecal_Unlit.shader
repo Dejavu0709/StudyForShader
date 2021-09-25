@@ -103,16 +103,14 @@ Shader "Universal Render Pipeline/NiloCat Extension/Screen Space Decal/Unlit"
             struct appdata
             {
                 float3 positionOS : POSITION;
-                float2 uv : TEXCOORD0;
             };
 
             struct v2f
             {
                 float4 positionCS : SV_POSITION;
-                float2 uv : TEXCOORD0;
-                float4 screenPos : TEXCOORD1;
-                float4 viewRayOS : TEXCOORD2; // xyz: viewRayOS, w: extra copy of positionVS.z 
-                float4 cameraPosOSAndFogFactor : TEXCOORD3;
+                float4 screenPos : TEXCOORD0;
+                float4 viewRayOS : TEXCOORD1; // xyz: viewRayOS, w: extra copy of positionVS.z 
+                float4 cameraPosOSAndFogFactor : TEXCOORD2;
             };
 
             sampler2D _MainTex;
@@ -129,7 +127,7 @@ Shader "Universal Render Pipeline/NiloCat Extension/Screen Space Decal/Unlit"
             v2f vert(appdata input)
             {
                 v2f o;
-                o.uv = input.uv;
+
                 // VertexPositionInputs contains position in multiple spaces (world, view, homogeneous clip space, ndc)
                 // Unity compiler will strip all unused references (say you don't use view space).
                 // Therefore there is more flexibility at no additional cost with this struct.
@@ -137,7 +135,6 @@ Shader "Universal Render Pipeline/NiloCat Extension/Screen Space Decal/Unlit"
 
                 o.positionCS = vertexPositionInput.positionCS;
 
-                
                 // regular unity fog
 #if _UnityFogEnable
                 o.cameraPosOSAndFogFactor.a = ComputeFogFactor(o.positionCS.z);
@@ -166,18 +163,9 @@ Shader "Universal Render Pipeline/NiloCat Extension/Screen Space Decal/Unlit"
                 // it is ok to write very expensive code in decal's vertex shader, 
                 // it is just a unity cube(4*6 vertices) per decal only, won't affect GPU performance at all.
                 float4x4 ViewToObjectMatrix = mul(UNITY_MATRIX_I_M, UNITY_MATRIX_I_V);
-                
+
                 // transform everything to object space(decal space) in vertex shader first, so we can skip all matrix mul() in fragment shader
                 o.viewRayOS.xyz = mul((float3x3)ViewToObjectMatrix, viewRay);
-             //   o.viewRayOS.xyz = mul(ViewToObjectMatrix, float4(viewRay, 1)).xyz;
-               // o.viewRayOS.xyz = mul(UNITY_MATRIX_M, float4(input.positionOS, 1.0)).xyz;
-               // o.viewRayOS.xyz = mul(UNITY_MATRIX_I_M, float4(vertexPositionInput.positionWS, 1.0)).xyz;
-             //   o.viewRayOS.xyz = input.positionOS;
-
-                //o.viewRayOS.xyz = mul((float3x3)UNITY_MATRIX_M, input.positionOS);
-            //    o.viewRayOS.xyz = vertexPositionInput.positionWS;
-              //  o.viewRayOS.xyz = input.positionOS;
-              //  o.viewRayOS.xyz = mul((float3x3)UNITY_MATRIX_I_M, vertexPositionInput.positionWS);
                 o.cameraPosOSAndFogFactor.xyz = mul(ViewToObjectMatrix, float4(0,0,0,1)).xyz; // hard code 0 or 1 can enable many compiler optimization
 
                 return o;
@@ -185,12 +173,6 @@ Shader "Universal Render Pipeline/NiloCat Extension/Screen Space Decal/Unlit"
 
             half4 frag(v2f i) : SV_Target
             {
-
-               //   half4 col2 = half4(i.viewRayOS.xyz, 1);
-              //    return col2;
-
-
-
                 // [important note]
                 //========================================================================
                 // now do "viewRay z division" that we skipped in vertex shader earlier.
@@ -247,7 +229,7 @@ Shader "Universal Render Pipeline/NiloCat Extension/Screen Space Decal/Unlit"
 
                 // convert unity cube's [-0.5,0.5] vertex pos range to [0,1] uv. Only works if you use a unity cube in mesh filter!
                 float2 decalSpaceUV = decalSpaceScenePos.xy + 0.5;
-               // float2 decalSpaceUV = decalSpaceScenePos.xy;
+
                 // discard logic
                 //===================================================
                 // discard "out of cube volume" pixels
@@ -261,27 +243,24 @@ Shader "Universal Render Pipeline/NiloCat Extension/Screen Space Decal/Unlit"
 #endif
                 // call discard
                 // if ZWrite is Off, clip() is fast enough on mobile, because it won't write the DepthBuffer, so no GPU pipeline stall(confirmed by ARM staff).
-            //    clip(2.5 - abs(decalSpaceScenePos) - shouldClip);
-              //  clip(0.2 - abs(decalSpaceScenePos));
+                clip(0.5 - abs(decalSpaceScenePos) - shouldClip);
                 //===================================================
 
                 // sample the decal texture
                 float2 uv = decalSpaceUV.xy * _MainTex_ST.xy + _MainTex_ST.zw;//Texture tiling & offset
 #if _FracUVEnable
-               // uv = frac(uv);// add frac to ignore texture wrap setting
+                uv = frac(uv);// add frac to ignore texture wrap setting
 #endif
                 half4 col = tex2D(_MainTex, uv);
-               col *= _Color;// tint color
-               col.a = saturate(col.a * _AlphaRemap.x + _AlphaRemap.y);// alpha remap MAD
-               col.rgb *= lerp(1, col.a, _MulAlphaToRGB);// extra multiply alpha to RGB
+                col *= _Color;// tint color
+                col.a = saturate(col.a * _AlphaRemap.x + _AlphaRemap.y);// alpha remap MAD
+                col.rgb *= lerp(1, col.a, _MulAlphaToRGB);// extra multiply alpha to RGB
 
 #if _UnityFogEnable
                 // Mix the pixel color with fogColor. You can optionaly use MixFogColor to override the fogColor
                 // with a custom one.
                 col.rgb = MixFog(col.rgb, i.cameraPosOSAndFogFactor.a);
 #endif
-                return float4(normalize(i.viewRayOS.xyz), 1);
-                return float4(i.positionCS);
                 return col;
             }
             ENDHLSL
