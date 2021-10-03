@@ -81,11 +81,12 @@ public class CustomPostRenderPass : ScriptableRenderPass
         // if ((renderingData.cameraData.camera.cullingMask & 1 << LayerMask.NameToLayer("UI")) > 0) 
         if ((renderingData.cameraData.camera.cullingMask & 1 << LayerMask.NameToLayer("RT")) > 0)
             return;
-
-
-
-       // if (!CustomPostProMgr.Instance.TakeRT)
-         //   return;
+        if (!renderingData.cameraData.postProcessEnabled) return;
+        var stack = VolumeManager.instance.stack;
+        ScanLineBlock ScanLineBlock = stack.GetComponent<ScanLineBlock>();
+        if (ScanLineBlock == null || !ScanLineBlock.IsActive()) { return; }
+        // if (!CustomPostProMgr.Instance.TakeRT)
+        //   return;
         _cmd = CommandBufferPool.Get(_cmdName);
 
 
@@ -111,6 +112,7 @@ public class CustomPostRenderPass : ScriptableRenderPass
         {
             cmd.ReleaseTemporaryRT(_temporaryColorTexture.id);
             cmd.ReleaseTemporaryRT(_rtID.id);
+            cmd.ReleaseTemporaryRT(_rtWhiteHole.id);
             // cmd.ReleaseTemporaryRT(blurredID2.id);
         }
     }
