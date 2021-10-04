@@ -163,9 +163,6 @@ MonoBehaviour:
   focusScreenPosition:
     m_OverrideState: 0
     m_Value: {x: 0, y: 0}
-  referenceResolutionX:
-    m_OverrideState: 0
-    m_Value: 1334
 --- !u!114 &9053815867798427801
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -182,13 +179,10 @@ MonoBehaviour:
   m_AdvancedMode: 0
   focusPower:
     m_OverrideState: 1
-    m_Value: 50
+    m_Value: 57.9
   focusDetail:
     m_OverrideState: 1
     m_Value: 3
   focusScreenPosition:
     m_OverrideState: 1
     m_Value: {x: 0, y: 0}
-  referenceResolutionX:
-    m_OverrideState: 1
-    m_Value: 1334
