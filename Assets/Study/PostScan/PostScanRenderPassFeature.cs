@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-public class CustomRenderPassFeature : ScriptableRendererFeature
+public class PostScanRenderPassFeature : ScriptableRendererFeature
 {
     [System.Serializable]
     public class Settings
@@ -15,13 +15,13 @@ public class CustomRenderPassFeature : ScriptableRendererFeature
         //public string PassName = "";
         public RenderTexture RT = null;
     }
-    CustomPostRenderPass _scriptablePass;
+    PostScanRenderPass _scriptablePass;
     private RenderTargetHandle dest;
     public Settings settings;
     /// <inheritdoc/>
     public override void Create()
     {
-        _scriptablePass = new CustomPostRenderPass(settings);
+        _scriptablePass = new PostScanRenderPass(settings);
         _scriptablePass.renderPassEvent = settings.RenderEvent;
     }
 
@@ -37,7 +37,7 @@ public class CustomRenderPassFeature : ScriptableRendererFeature
 }
 
 
-public class CustomPostRenderPass : ScriptableRenderPass
+public class PostScanRenderPass : ScriptableRenderPass
 {
     private CommandBuffer _cmd;
     private string _cmdName;
@@ -56,7 +56,7 @@ public class CustomPostRenderPass : ScriptableRenderPass
     RenderTargetHandle _rtID;
     RenderTargetHandle _rtWhiteHole;
     //RenderTargetHandle blurredID2;
-    public CustomPostRenderPass(CustomRenderPassFeature.Settings param)
+    public PostScanRenderPass(PostScanRenderPassFeature.Settings param)
     {
         renderPassEvent = param.RenderEvent;
         _cmdName = param.CmdName;
@@ -83,7 +83,7 @@ public class CustomPostRenderPass : ScriptableRenderPass
             return;
         if (!renderingData.cameraData.postProcessEnabled) return;
         var stack = VolumeManager.instance.stack;
-        ScanLineBlock ScanLineBlock = stack.GetComponent<ScanLineBlock>();
+        PostScanVolume ScanLineBlock = stack.GetComponent<PostScanVolume>();
         if (ScanLineBlock == null || !ScanLineBlock.IsActive()) { return; }
         // if (!CustomPostProMgr.Instance.TakeRT)
         //   return;

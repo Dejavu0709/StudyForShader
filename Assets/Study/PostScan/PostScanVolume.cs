@@ -5,8 +5,8 @@ using System;
  
 namespace UnityEngine.Rendering.Universal
 {
-    [System.Serializable, VolumeComponentMenu("Dejavu/ScanLineBlock")]
-    public sealed class ScanLineBlock : VolumeComponent, IPostProcessComponent
+    [System.Serializable, VolumeComponentMenu("Dejavu/PostScanVolume")]
+    public sealed class PostScanVolume : VolumeComponent, IPostProcessComponent
     {
         [Tooltip("是否开启效果")]
         public BoolParameter enableEffect = new BoolParameter(true);

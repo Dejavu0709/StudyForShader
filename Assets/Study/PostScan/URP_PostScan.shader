@@ -110,17 +110,16 @@ Shader "Universal Render Pipeline/Dejavu/PostScan"
 
              float2 uv = decalSpaceUV.xy * _MainTex_ST.xy + _MainTex_ST.zw;//Texture tiling & offset
 
-             half4 col = tex2D(_ScanTex, uv);
-             col *= _Color;// tint color
              uv = (normalize(i.viewRay).xyzw * sceneDepthVS).xy;
              uv = i.uv + uv * _DepthAffect;
              uv = uv * _ScanTex_ST.xy + _ScanTex_ST.zw;
              float offset = fmod(_Time.y, _Period) / _Period;
              float2 center = float2(0.5, 0.5);
              uv -= center;
-             uv = uv - offset*uv;
+             uv = uv - offset * uv;
              uv += center;
-             col = tex2D(_ScanTex, uv);
+             half4  col = tex2D(_ScanTex, uv);
+             col *= _Color;// tint color
              return col;
         }
 
