@@ -27,7 +27,7 @@ public class DepthScanLinePass : ScriptableRenderPass
     static readonly int ScanLineWidthId = Shader.PropertyToID("_ScanLineWidth");
     static readonly int ScanLightStrengthId = Shader.PropertyToID("_ScanLightStrength");
     static readonly int ScanValueId = Shader.PropertyToID("_ScanValue");
-
+    static float scanValue = 0;
 
     DepthScanLineVolume depthScanLineVolume;
     Material material;
@@ -81,7 +81,14 @@ public class DepthScanLinePass : ScriptableRenderPass
          material.SetFloat(ScanLightStrengthId, depthScanLineVolume.ScanLightStrength.value);
         material.SetFloat(ScanLineWidthId, depthScanLineVolume.ScanLineWidth.value);
         material.SetVector(ScanLineColorId, depthScanLineVolume.ScanLineColor.value);
-        material.SetFloat(ScanValueId, depthScanLineVolume.ScanValueId.value);
+        
+        scanValue += 0.01f * depthScanLineVolume.ScanSpeed.value;
+        //限制一下最大值，最小值
+        //scanValue = Mathf.Min(0.95f, 1 - scanValue);
+        if (scanValue > 0.98f)
+            scanValue = 0;
+        Debug.Log("scanValue:" + scanValue);
+        material.SetFloat(ScanValueId, 1 - scanValue);
         int shaderPass = 0;
         cmd.SetGlobalTexture(MainTexId, source);
         cmd.GetTemporaryRT(destination, w, h, 0, FilterMode.Point, RenderTextureFormat.Default);

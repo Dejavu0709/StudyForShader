@@ -20,7 +20,7 @@ Shader "Universal Render Pipeline/Dejavu/DepthScanLine"
         HLSLINCLUDE
        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
         CBUFFER_START(UnityPerMaterial)
-        float4 _MainTex_ST;
+       // float4 _MainTex_ST;
       //  float4 _ScanTex_ST;
         half4 _ScanLineColor;
         float _ScanValue;
@@ -29,8 +29,9 @@ Shader "Universal Render Pipeline/Dejavu/DepthScanLine"
 
         CBUFFER_END
 
-        TEXTURE2D(_MainTex);
-        SAMPLER(sampler_MainTex);
+        //TEXTURE2D(_MainTex);
+        //SAMPLER(sampler_MainTex);
+        sampler2D _MainTex;
       //  sampler2D _ScanTex;
         sampler2D _CameraDepthTexture;
 
@@ -44,6 +45,7 @@ Shader "Universal Render Pipeline/Dejavu/DepthScanLine"
         struct v2f {
             float4 positionCS : SV_POSITION;
             float2 uv : TEXCOORD0;
+            float4 screenPos : TEXCOORD1;
             UNITY_VERTEX_OUTPUT_STEREO
         };
 
@@ -55,6 +57,8 @@ Shader "Universal Render Pipeline/Dejavu/DepthScanLine"
             UNITY_SETUP_INSTANCE_ID(v);
             UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
             o.positionCS = TransformObjectToHClip(v.positionOS.xyz);
+            // prepare depth texture's screen space UV
+            o.screenPos = ComputeScreenPos(o.positionCS);
             o.uv = v.uv;
             return o;
         }
@@ -65,14 +69,13 @@ Shader "Universal Render Pipeline/Dejavu/DepthScanLine"
             //float  sceneRawDepth2 = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);
             //float sceneDepthVS2 = Linear01Depth(sceneRawDepth2, _ZBufferParams);
 
-
              float sceneRawDepth2 = tex2D(_CameraDepthTexture, i.uv).r;
-             float sceneDepthVS2 = -Linear01Depth(sceneRawDepth2, _ZBufferParams);
-            // float sceneDepthVS2 = LinearEyeDepth(sceneRawDepth2, _ZBufferParams);
-            // float sceneDepthVS2 = Linear01Depth(sceneRawDepth2);
-             float4 screenCol = tex2D(sampler_MainTex, i.uv);
-           //  screenCol = half4(sceneDepthVS2,0,0,1);
-             if (sceneDepthVS2 > _ScanValue && sceneDepthVS2 < _ScanValue + _ScanLineWidth)
+             float sceneDepthVS2 = Linear01Depth(sceneRawDepth2, _ZBufferParams);
+             //float sceneDepthVS2 = LinearEyeDepth(sceneRawDepth2, _ZBufferParams);
+    
+             float4 screenCol = tex2D(_MainTex, i.uv);
+             //screenCol = half4( 100*sceneDepthVS2,0,0,1);
+             if (sceneDepthVS2 * 20 > _ScanValue && sceneDepthVS2 * 20 < _ScanValue + _ScanLineWidth)
              {
                  return screenCol * _ScanLightStrength * _ScanLineColor;
              }
@@ -89,7 +92,7 @@ Shader "Universal Render Pipeline/Dejavu/DepthScanLine"
                 Tags { "RenderPipeline" = "UniversalPipeline"  "RenderType" = "Overlay" "Queue" = "Transparent-499" "DisableBatching" = "True" }
                 LOD 100
                 ZTest Always Cull Off ZWrite Off
-                Blend[_SrcBlend][_DstBlend]
+                Blend one OneMinusSrcAlpha
                 Pass
                 {
                      Name "ScanLine"
