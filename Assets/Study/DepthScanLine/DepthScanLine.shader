@@ -26,7 +26,7 @@ Shader "Universal Render Pipeline/Dejavu/DepthScanLine"
         float _ScanValue;
         float _ScanLineWidth;
         float _ScanLightStrength;
-
+        float _DistortFactor;
         CBUFFER_END
 
         //TEXTURE2D(_MainTex);
@@ -72,8 +72,10 @@ Shader "Universal Render Pipeline/Dejavu/DepthScanLine"
              float sceneRawDepth2 = tex2D(_CameraDepthTexture, i.uv).r;
              float sceneDepthVS2 = Linear01Depth(sceneRawDepth2, _ZBufferParams);
              //float sceneDepthVS2 = LinearEyeDepth(sceneRawDepth2, _ZBufferParams);
-    
-             float4 screenCol = tex2D(_MainTex, i.uv);
+             float2 dir = i.uv - float2(0.5, 0.5);
+             float2 offset = _DistortFactor * normalize(dir) * (1 - length(dir));
+             float2 uv = i.uv - offset * sceneDepthVS2;
+             float4 screenCol = tex2D(_MainTex, uv);
              //screenCol = half4( 100*sceneDepthVS2,0,0,1);
              if (sceneDepthVS2 * 20 > _ScanValue && sceneDepthVS2 * 20 < _ScanValue + _ScanLineWidth)
              {

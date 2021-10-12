@@ -16,6 +16,10 @@ public class DepthScanLineVolume : VolumeComponent, IPostProcessComponent
     public Vector4Parameter ScanLineColor = new Vector4Parameter(Vector4.one);
     [Range(0f, 1f), Tooltip("移动速度")]
     public FloatParameter ScanSpeed = new FloatParameter(1.0f);
+    [Range(0f, 1f), Tooltip("扭曲强度")]
+    public FloatParameter DistortFactor = new FloatParameter(1.0f);
+
+
     public bool IsActive() => enableEffect == true;
 
     public bool IsTileCompatible() => false;
