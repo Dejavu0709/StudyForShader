@@ -28,7 +28,7 @@ public class DepthScanLinePass : ScriptableRenderPass
     static readonly int ScanLightStrengthId = Shader.PropertyToID("_ScanLightStrength");
     static readonly int ScanValueId = Shader.PropertyToID("_ScanValue");
     static readonly int DistortFactorId = Shader.PropertyToID("_DistortFactor");
-    static float scanValue = 0;
+    static float scanValue = 0.5f;
 
     DepthScanLineVolume depthScanLineVolume;
     Material material;
@@ -82,14 +82,13 @@ public class DepthScanLinePass : ScriptableRenderPass
         material.SetFloat(ScanLightStrengthId, depthScanLineVolume.ScanLightStrength.value);
         material.SetFloat(ScanLineWidthId, depthScanLineVolume.ScanLineWidth.value);
         material.SetVector(ScanLineColorId, depthScanLineVolume.ScanLineColor.value);
-        material.SetFloat(ScanLineWidthId, depthScanLineVolume.ScanLineWidth.value);
 
         scanValue += 0.01f * depthScanLineVolume.ScanSpeed.value;
         //限制一下最大值，最小值
         //scanValue = Mathf.Min(0.95f, 1 - scanValue);
-        if (scanValue > 0.98f)
-            scanValue = 0;
-        Debug.Log("scanValue:" + scanValue);
+        if (scanValue > 1.0f)
+            scanValue = 0.5f;
+        //Debug.Log("scanValue:" + scanValue);
         material.SetFloat(DistortFactorId, depthScanLineVolume.DistortFactor.value * scanValue);
         material.SetFloat(ScanValueId, 1 - scanValue);
         int shaderPass = 0;
