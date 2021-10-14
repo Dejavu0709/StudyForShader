@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-3727136421674187576
+--- !u!114 &-3988176576833820602
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -26,9 +26,9 @@ MonoBehaviour:
   m_Name: CustomForwardRendererData
   m_EditorClassIdentifier: 
   m_RendererFeatures:
-  - {fileID: -3727136421674187576}
   - {fileID: 7847077368040297465}
-  m_RendererFeatureMap: c884b0f42b8d46ccf9930c674a6be66c
+  - {fileID: -3988176576833820602}
+  m_RendererFeatureMap: f9930c674a6be66c4668499c8826a7c8
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
   shaders:

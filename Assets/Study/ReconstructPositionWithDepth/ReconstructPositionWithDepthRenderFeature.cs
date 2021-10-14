@@ -20,9 +20,10 @@ public class ReconstructPositionWithDepthRenderFeature : ScriptableRendererFeatu
 
 public class ReconstructPositionWithDepthPass : ScriptableRenderPass
 {
-    static readonly string k_RenderTag = "Render DepthScanLine Effects";
+    static readonly string k_RenderTag = "ReconstructPositionWithDepthPass Effects";
     static readonly int MainTexId = Shader.PropertyToID("_MainTex");
     static readonly int TempTargetId = Shader.PropertyToID("_TempTarget");
+    static readonly int InverseVPMatrixId = Shader.PropertyToID("_InverseVPMatrix");
     //static readonly int ScanLineColorId = Shader.PropertyToID("_ScanLineColor");
     //static readonly int ScanLineWidthId = Shader.PropertyToID("_ScanLineWidth");
     //static readonly int ScanLightStrengthId = Shader.PropertyToID("_ScanLightStrength");
@@ -36,7 +37,8 @@ public class ReconstructPositionWithDepthPass : ScriptableRenderPass
     public ReconstructPositionWithDepthPass(RenderPassEvent evt)
     {
         renderPassEvent = evt;
-        var shader = Shader.Find("Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/ReconstructPositionByInvMatrix");
+        //var shader = Shader.Find("Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/ReconstructPositionByInvMatrix");
+        var shader = Shader.Find("Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/ReconstructPositionByRay");
         if (shader == null)
         {
             Debug.LogError("Shader not found.");
@@ -80,6 +82,11 @@ public class ReconstructPositionWithDepthPass : ScriptableRenderPass
         var h = cameraData.camera.scaledPixelHeight;
 
         int shaderPass = 0;
+        cmd.SetGlobalTexture(MainTexId, source);
+
+        var vpMatrix = Camera.main.projectionMatrix * Camera.main.worldToCameraMatrix;
+        //Debug.Log(vpMatrix.inverse);
+        cmd.SetGlobalMatrix(InverseVPMatrixId, vpMatrix.inverse);
         cmd.SetGlobalTexture(MainTexId, source);
         cmd.GetTemporaryRT(destination, w, h, 0, FilterMode.Point, RenderTextureFormat.Default);
         cmd.Blit(source, destination);

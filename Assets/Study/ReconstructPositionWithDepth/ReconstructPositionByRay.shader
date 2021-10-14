@@ -3,7 +3,7 @@
 // see README here: 
 // github.com/ColinLeung-NiloCat/UnityURPUnlitScreenSpaceDecalShader
 
-Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/ReconstructPositionByInvMatrix"
+Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/ReconstructPositionByRay"
 {
     Properties
     {
@@ -44,7 +44,8 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
     struct v2f {
         float4 positionCS : SV_POSITION;
         float2 uv : TEXCOORD0;
-        float4 screenPos : TEXCOORD1;
+        float3 viewRay : TEXCOORD1;
+        float3 viewRayWorld : TEXCOORD2;
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
@@ -56,8 +57,12 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
         UNITY_SETUP_INSTANCE_ID(v);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
         o.positionCS = TransformObjectToHClip(v.positionOS.xyz);
+
+        float4 clipPos = float4(v.uv * 2 - 1.0, 1, 1.0);
+        float4 viewRay = mul(UNITY_MATRIX_I_P, clipPos);
+        o.viewRay = viewRay.xyz / viewRay.w;
         // prepare depth texture's screen space UV
-        o.screenPos = ComputeScreenPos(o.positionCS);
+        o.viewRayWorld = mul((float3x3)UNITY_MATRIX_I_V, viewRay.xyz);
         o.uv = v.uv;
 
         return o;
@@ -95,7 +100,10 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
         */
 
         float sceneRawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, i.uv);
-        float3 worldPos = ComputeWorldSpacePosition(i.uv, sceneRawDepth, UNITY_MATRIX_I_VP);
+    
+        float linear01Depth = Linear01Depth(sceneRawDepth, _ZBufferParams);;
+        //float3 worldPos = _WorldSpaceCameraPos.xyz + linear01Depth * i.viewRay;
+        float3 worldPos = _WorldSpaceCameraPos.xyz + linear01Depth * i.viewRayWorld;
         return float4(worldPos, 1);
         
     }
