@@ -24,6 +24,8 @@ public class ReconstructPositionWithDepthPass : ScriptableRenderPass
     static readonly int MainTexId = Shader.PropertyToID("_MainTex");
     static readonly int TempTargetId = Shader.PropertyToID("_TempTarget");
     static readonly int InverseVPMatrixId = Shader.PropertyToID("_InverseVPMatrix");
+    static readonly int InverseVMatrixId = Shader.PropertyToID("_InverseVMatrix");
+    static readonly int InversePMatrixId = Shader.PropertyToID("_InversePMatrix");
     //static readonly int ScanLineColorId = Shader.PropertyToID("_ScanLineColor");
     //static readonly int ScanLineWidthId = Shader.PropertyToID("_ScanLineWidth");
     //static readonly int ScanLightStrengthId = Shader.PropertyToID("_ScanLightStrength");
@@ -87,6 +89,8 @@ public class ReconstructPositionWithDepthPass : ScriptableRenderPass
         var vpMatrix = Camera.main.projectionMatrix * Camera.main.worldToCameraMatrix;
         //Debug.Log(vpMatrix.inverse);
         cmd.SetGlobalMatrix(InverseVPMatrixId, vpMatrix.inverse);
+        cmd.SetGlobalMatrix(InversePMatrixId, Camera.main.projectionMatrix.inverse);
+        cmd.SetGlobalMatrix(InverseVMatrixId, Camera.main.worldToCameraMatrix.inverse);
         cmd.SetGlobalTexture(MainTexId, source);
         cmd.GetTemporaryRT(destination, w, h, 0, FilterMode.Point, RenderTextureFormat.Default);
         cmd.Blit(source, destination);

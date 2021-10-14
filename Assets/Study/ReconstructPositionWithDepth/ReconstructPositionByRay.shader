@@ -23,6 +23,8 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
         float4 _MainTex_ST;
        //  float4 _ScanTex_ST;
         float4x4 _InverseVPMatrix;
+        float4x4 _InverseVMatrix;
+        float4x4 _InversePMatrix;
         half4 _ScanLineColor;
         CBUFFER_END
 
@@ -58,11 +60,13 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
         o.positionCS = TransformObjectToHClip(v.positionOS.xyz);
 
-        float4 clipPos = float4(v.uv * 2 - 1.0, 1, 1.0);
-        float4 viewRay = mul(UNITY_MATRIX_I_P, clipPos);
+        float4 clipPos = float4(v.uv * 2 - 1.0, 1.0, 1.0);
+        //float4 viewRay = mul(UNITY_MATRIX_I_P, clipPos);
+        float4 viewRay = mul(_InversePMatrix, clipPos);
         o.viewRay = viewRay.xyz / viewRay.w;
         // prepare depth texture's screen space UV
-        o.viewRayWorld = mul((float3x3)UNITY_MATRIX_I_V, viewRay.xyz);
+        o.viewRayWorld = mul((float3x3)_InverseVMatrix, viewRay.xyz);
+        //o.viewRayWorld = mul((float3x3)UNITY_MATRIX_I_V, viewRay.xyz);
         o.uv = v.uv;
 
         return o;
