@@ -60,13 +60,59 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
         o.positionCS = TransformObjectToHClip(v.positionOS.xyz);
 
-        float4 clipPos = float4(v.uv * 2 - 1.0, 1.0, 1.0);
-        //float4 viewRay = mul(UNITY_MATRIX_I_P, clipPos);
-        float4 viewRay = mul(_InversePMatrix, clipPos);
+        float4 clipPos = float4(v.uv * 2 - 1.0, 0.0, 1.0);
+       // float4 clipPos = float4(v.uv , 0.0, 1.0);
+        clipPos.y *= -1;
+
+
+        
+
+        clipPos =  ComputeClipSpacePosition(v.uv, 0);
+
+        float4 viewRay = mul(UNITY_MATRIX_I_P, clipPos);
+
+        o.viewRay = viewRay;
+        //clipPos.z *= -1;
+
+        //float4 viewRay = mul(_InversePMatrix, clipPos);
+
+        //viewRay.z *= -1;
         o.viewRay = viewRay.xyz / viewRay.w;
-        // prepare depth texture's screen space UV
-        o.viewRayWorld = mul((float3x3)_InverseVMatrix, viewRay.xyz);
-        //o.viewRayWorld = mul((float3x3)UNITY_MATRIX_I_V, viewRay.xyz);
+
+        o.viewRayWorld = mul(_InverseVMatrix, float4(o.viewRay, 1));
+        o.viewRayWorld = o.viewRayWorld - _WorldSpaceCameraPos.xyz;
+
+        //o.viewRayWorld = mul((float3x3)_InverseVMatrix, o.viewRay);
+
+
+     //   o.viewRay = viewRay;
+      //  viewRay.z *= -1;
+
+       // o.viewRayWorld = mul((float3x3)UNITY_MATRIX_I_V, o.viewRay);
+
+
+        /*
+        float sceneRawDepth = 1;
+#if defined(UNITY_REVERSED_Z)
+        sceneRawDepth = 1 - sceneRawDepth;
+#endif
+        float3 worldPos = ComputeWorldSpacePosition(v.uv, sceneRawDepth, UNITY_MATRIX_I_VP);
+        o.viewRayWorld = worldPos - _WorldSpaceCameraPos.xyz;
+        */
+
+
+
+
+
+       //  o.viewRay = ComputeViewSpacePosition(v.uv,  0, UNITY_MATRIX_I_P);
+        //float4 positionCS = ComputeClipSpacePosition(v.uv * 2 - 1.0, 1);
+        //float4 positionVS = mul(UNITY_MATRIX_I_P, positionCS);
+        // The view space uses a right-handed coordinate system.
+       // positionVS.z = -positionVS.z;
+        //o.viewRay =  positionVS.xyz / positionVS.w;
+
+
+
         o.uv = v.uv;
 
         return o;
@@ -105,9 +151,14 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
 
         float sceneRawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, i.uv);
     
-        float linear01Depth = Linear01Depth(sceneRawDepth, _ZBufferParams);;
+        float linear01Depth = Linear01Depth(sceneRawDepth, _ZBufferParams);
         //float3 worldPos = _WorldSpaceCameraPos.xyz + linear01Depth * i.viewRay;
-        float3 worldPos = _WorldSpaceCameraPos.xyz + linear01Depth * i.viewRayWorld;
+        //float3 worldPos = linear01Depth * i.viewRayWorld;
+        //float3 worldPos = _WorldSpaceCameraPos.xyz + (linear01Depth) * i.viewRayWorld;
+        //float3 worldPos = i.viewRay;
+        float3 worldPos = _WorldSpaceCameraPos.xyz + ( linear01Depth) * i.viewRayWorld ;
+
+       // float3 worldPos = i.viewRayWorld;
         return float4(worldPos, 1);
         
     }
