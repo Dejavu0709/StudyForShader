@@ -2,7 +2,7 @@
 //https://blog.csdn.net/puppet_master  
 //2018.6.10  
 //打印对象在世界空间位置
-Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/WorldPosPrintTest"
+Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/ViewPosPrint"
 {
 	SubShader
 	{
@@ -41,8 +41,6 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/WorldPosPr
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 				o.vertex = TransformObjectToHClip(v.vertex);
 				o.worldPos = mul(UNITY_MATRIX_V, v.vertex);
-				//o.vertex = UnityObjectToClipPos(v.vertex);
-				//o.worldPos = mul(unity_ObjectToWorld, v.vertex);
 				return o;
 			}
 

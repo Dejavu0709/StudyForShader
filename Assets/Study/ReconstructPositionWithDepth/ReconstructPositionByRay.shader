@@ -60,30 +60,32 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
         o.positionCS = TransformObjectToHClip(v.positionOS.xyz);
 
-
+        //方法1
+        float sceneRawDepth = 1;
+ #if defined(UNITY_REVERSED_Z)
+        sceneRawDepth = 1 - sceneRawDepth;
+#endif
+        float3 worldPos = ComputeWorldSpacePosition(v.uv, sceneRawDepth, UNITY_MATRIX_I_VP);
+        o.viewRayWorld = worldPos - _WorldSpaceCameraPos.xyz;
         
+     
+        /*方法2
         float4 clipPos =  ComputeClipSpacePosition(v.uv, 0);
         float4 viewRay = mul(UNITY_MATRIX_I_P, clipPos);
         o.viewRay = viewRay;
         o.viewRay = viewRay.xyz / viewRay.w;
         o.viewRayWorld = mul(_InverseVMatrix, float4(o.viewRay, 1));
         o.viewRayWorld = o.viewRayWorld - _WorldSpaceCameraPos.xyz;
-        
-        o.viewRayWorld = mul((float3x3)_InverseVMatrix, o.viewRay);
-
-
-
-
-
-        /*
-        float sceneRawDepth = 1;
-#if defined(UNITY_REVERSED_Z)
-        sceneRawDepth = 1 - sceneRawDepth;
-#endif
-        float3 worldPos = ComputeWorldSpacePosition(v.uv, sceneRawDepth, UNITY_MATRIX_I_VP);
-        o.viewRayWorld = worldPos - _WorldSpaceCameraPos.xyz;
         */
 
+        /*方法3
+        float4 clipPos =  ComputeClipSpacePosition(v.uv, 0);
+        float4 viewRay = mul(UNITY_MATRIX_I_P, clipPos);
+        o.viewRay = viewRay;
+        o.viewRay = viewRay.xyz / viewRay.w;
+        o.viewRayWorld = mul(_InverseVMatrix, float4(o.viewRay, 1));
+        o.viewRayWorld = mul((float3x3)_InverseVMatrix, o.viewRay);
+        */
         o.uv = v.uv;
         return o;
     }
@@ -91,46 +93,10 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
     //fragment shader
     float4 frag(v2f i) : SV_Target
     {
-        //  return float4(i.uv,0, 1);
-        /*
         float sceneRawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, i.uv);
-
-    #if defined(UNITY_REVERSED_Z)
-        sceneRawDepth = 1 - sceneRawDepth;
-    #endif
-        float4 ndc = float4(i.uv.x * 2 - 1, i.uv.y * 2 - 1, sceneRawDepth * 2 - 1, 1);
-
-        float4 worldPos = mul(_InverseVPMatrix, ndc);
-        worldPos /= worldPos.w;
-        worldPos.z *= 1;
-        return worldPos;
-        */
-
-
-
-        /*
-        float sceneRawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, i.uv);
-        float4 ndc = float4(i.uv.x * 2 - 1, i.uv.y * 2 - 1, sceneRawDepth, 1);
-        #if UNITY_UV_STARTS_AT_TOP
-           ndc.y *= -1;
-        #endif
-        float4 worldPos = mul(UNITY_MATRIX_I_VP, ndc);
-        worldPos /= worldPos.w;
-        return worldPos;
-        */
-
-        float sceneRawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, i.uv);
-    
         float linear01Depth = Linear01Depth(sceneRawDepth, _ZBufferParams);
-        //float3 worldPos = _WorldSpaceCameraPos.xyz + linear01Depth * i.viewRay;
-        //float3 worldPos = linear01Depth * i.viewRayWorld;
-        //float3 worldPos = _WorldSpaceCameraPos.xyz + (linear01Depth) * i.viewRayWorld;
-        //float3 worldPos = i.viewRay;
         float3 worldPos = _WorldSpaceCameraPos.xyz + ( linear01Depth) * i.viewRayWorld ;
-
-       // float3 worldPos = i.viewRayWorld;
         return float4(worldPos, 1);
-        
     }
 
 

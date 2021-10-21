@@ -40,7 +40,6 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/WorldPosPr
 				UNITY_SETUP_INSTANCE_ID(v);
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 				o.vertex = TransformObjectToHClip(v.vertex);
-				//o.vertex = UnityObjectToClipPos(v.vertex);
 				o.worldPos = mul(unity_ObjectToWorld, v.vertex);
 				return o;
 			}
