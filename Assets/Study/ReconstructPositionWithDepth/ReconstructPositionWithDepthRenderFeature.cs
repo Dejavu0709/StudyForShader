@@ -91,6 +91,8 @@ public class ReconstructPositionWithDepthPass : ScriptableRenderPass
         cmd.SetGlobalMatrix(InverseVPMatrixId, vpMatrix.inverse);
         cmd.SetGlobalMatrix(InversePMatrixId, Camera.main.projectionMatrix.inverse);
         cmd.SetGlobalMatrix(InverseVMatrixId, Camera.main.worldToCameraMatrix.inverse);
+        //Debug.Log(Camera.main.worldToCameraMatrix.inverse);
+        //Debug.Log(Camera.main.worldToCameraMatrix);
         cmd.SetGlobalTexture(MainTexId, source);
         cmd.GetTemporaryRT(destination, w, h, 0, FilterMode.Point, RenderTextureFormat.Default);
         cmd.Blit(source, destination);
