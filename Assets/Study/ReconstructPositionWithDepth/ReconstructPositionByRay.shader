@@ -61,31 +61,29 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
         o.positionCS = TransformObjectToHClip(v.positionOS.xyz);
 
         //方法1
+        /*
         float sceneRawDepth = 1;
  #if defined(UNITY_REVERSED_Z)
         sceneRawDepth = 1 - sceneRawDepth;
 #endif
         float3 worldPos = ComputeWorldSpacePosition(v.uv, sceneRawDepth, UNITY_MATRIX_I_VP);
         o.viewRayWorld = worldPos - _WorldSpaceCameraPos.xyz;
-        
+        */
      
-        /*方法2
+        //方法2
+        /*
         float4 clipPos =  ComputeClipSpacePosition(v.uv, 0);
-        float4 viewRay = mul(UNITY_MATRIX_I_P, clipPos);
-        o.viewRay = viewRay;
-        o.viewRay = viewRay.xyz / viewRay.w;
-        o.viewRayWorld = mul(_InverseVMatrix, float4(o.viewRay, 1));
-        o.viewRayWorld = o.viewRayWorld - _WorldSpaceCameraPos.xyz;
+        float4 viewPos = mul(UNITY_MATRIX_I_P, clipPos);
+        viewPos.xyz = viewPos.xyz / viewPos.w;
+        float3 worldPos = mul(_InverseVMatrix, viewPos).xyz;
+        o.viewRayWorld = worldPos - _WorldSpaceCameraPos.xyz;
         */
 
-        /*方法3
+        //方法3 
         float4 clipPos =  ComputeClipSpacePosition(v.uv, 0);
-        float4 viewRay = mul(UNITY_MATRIX_I_P, clipPos);
-        o.viewRay = viewRay;
-        o.viewRay = viewRay.xyz / viewRay.w;
-        o.viewRayWorld = mul(_InverseVMatrix, float4(o.viewRay, 1));
-        o.viewRayWorld = mul((float3x3)_InverseVMatrix, o.viewRay);
-        */
+        float4 viewPos = mul(UNITY_MATRIX_I_P, clipPos);
+        float3 viewRay = viewPos.xyz / viewPos.w;
+        o.viewRayWorld = mul((float3x3)_InverseVMatrix, viewRay);
         o.uv = v.uv;
         return o;
     }

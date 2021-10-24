@@ -1,7 +1,5 @@
-//puppet_master
-//https://blog.csdn.net/puppet_master  
-//2018.6.10  
-//打印对象在世界空间位置
+
+//打印在世界空间位置
 Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/WorldPosPrint"
 {
 	SubShader
@@ -83,6 +81,4 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/WorldPosPr
 			}
 
 	}
-		//fallback使之有shadow caster的pass
-		//		FallBack "Legacy Shaders/Diffuse"
 }
