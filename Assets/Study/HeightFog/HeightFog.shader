@@ -1,20 +1,22 @@
 
-
-Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/ReconstructPositionByInvMatrix"
+Shader "Universal Render Pipeline/Dejavu/HeightFog"
 {
     Properties
     {
         _MainTex("Base (RGB)", 2D) = "white" {}
-        [HDR]_ScanLineColor("_ScanLineColor (default = 1,1,1,1)", color) = (1,1,1,1)
+    
+        [HDR]_FogColor("_FogColor (default = 1,1,1,1)", color) = (1,1,1,1)
     }
 
 
-    HLSLINCLUDE
+        HLSLINCLUDE
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
         CBUFFER_START(UnityPerMaterial)
         float4 _MainTex_ST;
-        float4x4 _InverseVPMatrix;
-        half4 _ScanLineColor;
+        half4 _FogColor;
+        float  _FogStartHeight;
+        float _FogHeight;
+        float _FogIntensity;
         CBUFFER_END
 
         //TEXTURE2D(_MainTex);
@@ -34,7 +36,7 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
     struct v2f {
         float4 positionCS : SV_POSITION;
         float2 uv : TEXCOORD0;
-        float4 screenPos : TEXCOORD1;
+        float3 viewRayWorld : TEXCOORD1;
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
@@ -46,10 +48,15 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
         UNITY_SETUP_INSTANCE_ID(v);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
         o.positionCS = TransformObjectToHClip(v.positionOS.xyz);
-        // prepare depth texture's screen space UV
-        o.screenPos = ComputeScreenPos(o.positionCS);
+        //方法1
+        
+        float sceneRawDepth = 1;
+ #if defined(UNITY_REVERSED_Z)
+        sceneRawDepth = 1 - sceneRawDepth;
+#endif
+        float3 worldPos = ComputeWorldSpacePosition(v.uv, sceneRawDepth, UNITY_MATRIX_I_VP);
+        o.viewRayWorld = worldPos - _WorldSpaceCameraPos.xyz;
         o.uv = v.uv;
-
         return o;
     }
 
@@ -57,36 +64,20 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
     float4 frag(v2f i) : SV_Target
     {
         float sceneRawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, i.uv);
-        float3 worldPos = ComputeWorldSpacePosition(i.uv, sceneRawDepth, UNITY_MATRIX_I_VP);
-        return float4(worldPos, 1);
+        float linear01Depth = Linear01Depth(sceneRawDepth, _ZBufferParams);
+        float3 worldPos = _WorldSpaceCameraPos.xyz + ( linear01Depth) * i.viewRayWorld;
+        float blendParam  = saturate((_FogStartHeight - worldPos.y) / _FogHeight);
+        blendParam = max(linear01Depth * _FogHeight, blendParam);
+        half4 screenCol =  tex2D(_MainTex,  i.uv);
+        return lerp(screenCol, _FogColor, blendParam * _FogIntensity);
 
-        /*不使用ComputeWorldSpacePosition方法，自己撸
-        float sceneRawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, i.uv);
-        float4 ndc = float4(i.uv.x * 2 - 1, i.uv.y * 2 - 1, sceneRawDepth, 1);
-        #if UNITY_UV_STARTS_AT_TOP
-           ndc.y *= -1;
-        #endif
-        float4 worldPos = mul(UNITY_MATRIX_I_VP, ndc);
-        worldPos /= worldPos.w;
-        return worldPos;
-        */
-
-        /*从C#中传入Camera相关的逆矩阵
-        float sceneRawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, i.uv);
-    #if defined(UNITY_REVERSED_Z)
-        sceneRawDepth = 1 - sceneRawDepth;
-    #endif
-        float4 ndc = float4(i.uv.x * 2 - 1, i.uv.y * 2 - 1, sceneRawDepth * 2 - 1, 1);
-        float4 worldPos = mul(_InverseVPMatrix, ndc);
-        worldPos /= worldPos.w;
-        return worldPos;
-        */
     }
-    ENDHLSL
 
 
-    //开始SubShader
-    SubShader
+
+        ENDHLSL
+        //开始SubShader
+        SubShader
     {
 
         //Tags {"RenderType" = "Opaque"  "RenderPipeline" = "UniversalPipeline"}
@@ -96,13 +87,13 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
             Blend one zero
             Pass
         {
-             Name "ReconstructPositionByInvMatrix"
+             Name "HeightFog"
              //后处理效果一般都是这几个状态
 
              //使用上面定义的vertex和fragment shader
              HLSLPROGRAM
               #pragma vertex vert
-              #pragma fragment frag
+             #pragma fragment frag
              ENDHLSL
         }
 

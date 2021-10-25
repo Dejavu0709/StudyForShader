@@ -1,27 +1,18 @@
 
 
-// see README here: 
-// github.com/ColinLeung-NiloCat/UnityURPUnlitScreenSpaceDecalShader
-
 Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/ReconstructPositionByRay"
 {
     Properties
     {
         _MainTex("Base (RGB)", 2D) = "white" {}
-    //_ScanTex("Base (RGB)", 2D) = "white" {}
-    [HDR]_ScanLineColor("_ScanLineColor (default = 1,1,1,1)", color) = (1,1,1,1)
-
-    [Enum(UnityEngine.Rendering.BlendMode)]_SrcBlend("_SrcBlend (default = SrcAlpha)", Float) = 5 // 5 = SrcAlpha
-    [Enum(UnityEngine.Rendering.BlendMode)]_DstBlend("_DstBlend (default = OneMinusSrcAlpha)", Float) = 10 // 10 = OneMinusSrcAlpha
-
+        [HDR]_ScanLineColor("_ScanLineColor (default = 1,1,1,1)", color) = (1,1,1,1)
     }
 
 
-        HLSLINCLUDE
+    HLSLINCLUDE
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
         CBUFFER_START(UnityPerMaterial)
         float4 _MainTex_ST;
-       //  float4 _ScanTex_ST;
         float4x4 _InverseVPMatrix;
         float4x4 _InverseVMatrix;
         float4x4 _InversePMatrix;
@@ -31,7 +22,6 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
         //TEXTURE2D(_MainTex);
         //SAMPLER(sampler_MainTex);
         sampler2D _MainTex;
-    //  sampler2D _ScanTex;
         TEXTURE2D(_CameraDepthTexture);
         SAMPLER(sampler_CameraDepthTexture);
 
@@ -96,12 +86,10 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
         float3 worldPos = _WorldSpaceCameraPos.xyz + ( linear01Depth) * i.viewRayWorld ;
         return float4(worldPos, 1);
     }
+    ENDHLSL
 
-
-
-        ENDHLSL
-        //开始SubShader
-        SubShader
+     //开始SubShader
+    SubShader
     {
 
         //Tags {"RenderType" = "Opaque"  "RenderPipeline" = "UniversalPipeline"}
@@ -111,13 +99,13 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
             Blend one zero
             Pass
         {
-             Name "ScanLine"
+             Name "ReconstructPositionByRay"
              //后处理效果一般都是这几个状态
 
              //使用上面定义的vertex和fragment shader
              HLSLPROGRAM
               #pragma vertex vert
-             #pragma fragment frag
+              #pragma fragment frag
              ENDHLSL
         }
 

@@ -2,13 +2,13 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-public class ReconstructPositionWithDepthRenderFeature : ScriptableRendererFeature
+public class HeightFogRenderFeature : ScriptableRendererFeature
 {
-    ReconstructPositionWithDepthPass pass;
+    HeightFogPass pass;
 
     public override void Create()
     {
-        pass = new ReconstructPositionWithDepthPass(RenderPassEvent.BeforeRenderingPostProcessing);
+        pass = new HeightFogPass(RenderPassEvent.BeforeRenderingPostProcessing);
     }
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
@@ -18,29 +18,24 @@ public class ReconstructPositionWithDepthRenderFeature : ScriptableRendererFeatu
     }
 }
 
-public class ReconstructPositionWithDepthPass : ScriptableRenderPass
+public class HeightFogPass : ScriptableRenderPass
 {
-    static readonly string k_RenderTag = "ReconstructPositionWithDepthPass Effects";
+    static readonly string k_RenderTag = "HeightFogPass Effects";
     static readonly int MainTexId = Shader.PropertyToID("_MainTex");
     static readonly int TempTargetId = Shader.PropertyToID("_TempTarget");
-    static readonly int InverseVPMatrixId = Shader.PropertyToID("_InverseVPMatrix");
-    static readonly int InverseVMatrixId = Shader.PropertyToID("_InverseVMatrix");
-    static readonly int InversePMatrixId = Shader.PropertyToID("_InversePMatrix");
-    //static readonly int ScanLineColorId = Shader.PropertyToID("_ScanLineColor");
-    //static readonly int ScanLineWidthId = Shader.PropertyToID("_ScanLineWidth");
-    //static readonly int ScanLightStrengthId = Shader.PropertyToID("_ScanLightStrength");
-    //static readonly int ScanValueId = Shader.PropertyToID("_ScanValue");
-    //static readonly int DistortFactorId = Shader.PropertyToID("_DistortFactor");
+    static readonly int FogStartHeightId = Shader.PropertyToID("_FogStartHeight");
+    static readonly int FogHeightId = Shader.PropertyToID("_FogHeight");
+    static readonly int FogIntensity = Shader.PropertyToID("_FogIntensity");
+    static readonly int FogColorId = Shader.PropertyToID("_FogColor");
 
-    ReconstructPositionWithDepthVolume volume;
+    HeightFogVolume volume;
     Material material;
     RenderTargetIdentifier currentTarget;
 
-    public ReconstructPositionWithDepthPass(RenderPassEvent evt)
+    public HeightFogPass(RenderPassEvent evt)
     {
         renderPassEvent = evt;
-        //var shader = Shader.Find("Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/ReconstructPositionByInvMatrix");
-        var shader = Shader.Find("Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/ReconstructPositionByRay");
+        var shader = Shader.Find("Universal Render Pipeline/Dejavu/HeightFog");
         if (shader == null)
         {
             Debug.LogError("Shader not found.");
@@ -60,7 +55,7 @@ public class ReconstructPositionWithDepthPass : ScriptableRenderPass
         if (!renderingData.cameraData.postProcessEnabled) return;
 
         var stack = VolumeManager.instance.stack;
-        volume = stack.GetComponent<ReconstructPositionWithDepthVolume>();
+        volume = stack.GetComponent<HeightFogVolume>();
         if (volume == null) { return; }
         if (!volume.IsActive()) { return; }
         var cmd = CommandBufferPool.Get(k_RenderTag);
@@ -82,17 +77,12 @@ public class ReconstructPositionWithDepthPass : ScriptableRenderPass
 
         var w = cameraData.camera.scaledPixelWidth;
         var h = cameraData.camera.scaledPixelHeight;
-
+        material.SetFloat(FogStartHeightId, volume.FogStartHeight.value);
+        material.SetFloat(FogHeightId, volume.FogHeight.value);
+        material.SetFloat(FogIntensity, volume.FogIntensity.value);
+        material.SetColor(FogColorId, volume.FogColor.value);
         int shaderPass = 0;
         cmd.SetGlobalTexture(MainTexId, source);
-
-        var vpMatrix = Camera.main.projectionMatrix * Camera.main.worldToCameraMatrix;
-        //Debug.Log(vpMatrix.inverse);
-        cmd.SetGlobalMatrix(InverseVPMatrixId, vpMatrix.inverse);
-        cmd.SetGlobalMatrix(InversePMatrixId, Camera.main.projectionMatrix.inverse);
-        cmd.SetGlobalMatrix(InverseVMatrixId, Camera.main.worldToCameraMatrix.inverse);
-        //Debug.Log(Camera.main.worldToCameraMatrix.inverse);
-        //Debug.Log(Camera.main.worldToCameraMatrix);
         cmd.GetTemporaryRT(destination, w, h, 0, FilterMode.Point, RenderTextureFormat.Default);
         cmd.Blit(source, destination);
         cmd.Blit(destination, source, material, shaderPass);
