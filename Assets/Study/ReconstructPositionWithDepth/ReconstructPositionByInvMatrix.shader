@@ -56,10 +56,11 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
     //fragment shader
     float4 frag(v2f i) : SV_Target
     {
+        /*
         float sceneRawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, i.uv);
         float3 worldPos = ComputeWorldSpacePosition(i.uv, sceneRawDepth, UNITY_MATRIX_I_VP);
         return float4(worldPos, 1);
-
+        */
         /*不使用ComputeWorldSpacePosition方法，自己撸
         float sceneRawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, i.uv);
         float4 ndc = float4(i.uv.x * 2 - 1, i.uv.y * 2 - 1, sceneRawDepth, 1);
@@ -71,7 +72,7 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
         return worldPos;
         */
 
-        /*从C#中传入Camera相关的逆矩阵
+        //从C#中传入Camera相关的逆矩阵
         float sceneRawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, i.uv);
     #if defined(UNITY_REVERSED_Z)
         sceneRawDepth = 1 - sceneRawDepth;
@@ -80,7 +81,7 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
         float4 worldPos = mul(_InverseVPMatrix, ndc);
         worldPos /= worldPos.w;
         return worldPos;
-        */
+        
     }
     ENDHLSL
 

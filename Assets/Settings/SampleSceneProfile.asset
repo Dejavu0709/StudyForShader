@@ -146,6 +146,8 @@ MonoBehaviour:
   - {fileID: -7011558710299706105}
   - {fileID: -7645555531531615812}
   - {fileID: 2458913213007515846}
+  - {fileID: 4051564166732581847}
+  - {fileID: 2644861381411716255}
 --- !u!114 &849379129802519247
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -175,7 +177,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9e0da86b3bb4ea4586185d72b0220b9, type: 3}
   m_Name: HeightFogVolume
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   m_AdvancedMode: 0
   EnableEffect:
     m_OverrideState: 1
@@ -192,6 +194,55 @@ MonoBehaviour:
   FogColor:
     m_OverrideState: 1
     m_Value: {r: 0.9150943, g: 0.9150943, b: 0.9150943, a: 1}
+    hdr: 0
+    showAlpha: 1
+    showEyeDropper: 1
+--- !u!114 &2644861381411716255
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23a245db76a8ab94e8f4a8aff8edd464, type: 3}
+  m_Name: ReconstructPositionWithDepthVolume
+  m_EditorClassIdentifier: 
+  active: 1
+  m_AdvancedMode: 0
+  enableEffect:
+    m_OverrideState: 0
+    m_Value: 0
+--- !u!114 &4051564166732581847
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b29df5353afe344a9e9effa19d50919, type: 3}
+  m_Name: MotionBlurVolume
+  m_EditorClassIdentifier: 
+  active: 1
+  m_AdvancedMode: 0
+  EnableEffect:
+    m_OverrideState: 1
+    m_Value: 1
+  FogStartHeight:
+    m_OverrideState: 0
+    m_Value: 0
+  FogHeight:
+    m_OverrideState: 0
+    m_Value: 10
+  FogIntensity:
+    m_OverrideState: 0
+    m_Value: 0.5
+  FogColor:
+    m_OverrideState: 0
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
     hdr: 0
     showAlpha: 1
     showEyeDropper: 1

@@ -30,7 +30,8 @@ MonoBehaviour:
   - {fileID: -3988176576833820602}
   - {fileID: 6899644384769479409}
   - {fileID: 3793162840212869448}
-  m_RendererFeatureMap: f9930c674a6be66c4668499c8826a7c8f112b4160376c05f489119928105a434
+  - {fileID: 7698596835598245554}
+  m_RendererFeatureMap: f9930c674a6be66c4668499c8826a7c8f112b4160376c05f489119928105a434b29ec77608e9d66a
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
   shaders:
@@ -83,6 +84,19 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 991b55c8a4f355d4ba47f110fdb5631a, type: 3}
   m_Name: NewZoomBlurRenderFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &7698596835598245554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 212f81cefbe44204f90682cf47fbe351, type: 3}
+  m_Name: NewMotionBlurRenderFeature
   m_EditorClassIdentifier: 
   m_Active: 1
 --- !u!114 &7847077368040297465

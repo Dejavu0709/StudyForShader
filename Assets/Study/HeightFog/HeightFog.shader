@@ -14,7 +14,7 @@ Shader "Universal Render Pipeline/Dejavu/HeightFog"
         CBUFFER_START(UnityPerMaterial)
         float4 _MainTex_ST;
         half4 _FogColor;
-        float  _FogStartHeight;
+        float _FogStartHeight;
         float _FogHeight;
         float _FogIntensity;
         CBUFFER_END
