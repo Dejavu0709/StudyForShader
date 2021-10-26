@@ -23,11 +23,10 @@ public class MotionBlurPass : ScriptableRenderPass
     static readonly string k_RenderTag = "MotionBlurPass Effects";
     static readonly int MainTexId = Shader.PropertyToID("_MainTex");
     static readonly int TempTargetId = Shader.PropertyToID("_TempTarget");
-    static readonly int FogStartHeightId = Shader.PropertyToID("_FogStartHeight");
-    static readonly int FogHeightId = Shader.PropertyToID("_FogHeight");
-    static readonly int FogIntensity = Shader.PropertyToID("_FogIntensity");
-    static readonly int FogColorId = Shader.PropertyToID("_FogColor");
+    static readonly int BlurWeightId = Shader.PropertyToID("_BlurWeight");
+    static readonly int BlurStrengthId = Shader.PropertyToID("_BlurStrength");
     static readonly int InverseVPMatrixId = Shader.PropertyToID("_InverseVPMatrix");
+    static readonly int PreInverseVPMatrixId = Shader.PropertyToID("_PreInverseVPMatrix");
     MotionBlurVolume volume;
     Material material;
     RenderTargetIdentifier currentTarget;
@@ -69,6 +68,9 @@ public class MotionBlurPass : ScriptableRenderPass
         this.currentTarget = currentTarget;
     }
 
+    Matrix4x4 _curMatrix = Matrix4x4.identity;
+    Matrix4x4 _preMatrix = Matrix4x4.identity;
+
     void Render(CommandBuffer cmd, ref RenderingData renderingData)
     {
         ref var cameraData = ref renderingData.cameraData;
@@ -82,8 +84,13 @@ public class MotionBlurPass : ScriptableRenderPass
         //material.SetFloat(FogIntensity, volume.FogIntensity.value);
         //material.SetColor(FogColorId, volume.FogColor.value);
         var vpMatrix = Camera.main.projectionMatrix * Camera.main.worldToCameraMatrix;
+        _curMatrix = vpMatrix.inverse;
         //Debug.Log(vpMatrix.inverse);
-        cmd.SetGlobalMatrix(InverseVPMatrixId, vpMatrix.inverse);
+        cmd.SetGlobalMatrix(InverseVPMatrixId, _curMatrix);
+        cmd.SetGlobalMatrix(PreInverseVPMatrixId, _preMatrix);
+        material.SetFloat(BlurStrengthId, volume.BlurStrength.value);
+        material.SetVector(BlurWeightId, volume.BlurWeight.value);
+        _preMatrix = _curMatrix;
         int shaderPass = 0;
         cmd.SetGlobalTexture(MainTexId, source);
         cmd.GetTemporaryRT(destination, w, h, 0, FilterMode.Point, RenderTextureFormat.Default);

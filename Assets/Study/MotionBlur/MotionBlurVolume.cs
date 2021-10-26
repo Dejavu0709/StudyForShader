@@ -9,17 +9,11 @@ public class MotionBlurVolume : VolumeComponent, IPostProcessComponent
     [Tooltip("是否开启效果")]
     public BoolParameter EnableEffect = new BoolParameter(false);
 
-    [Tooltip("雾起始高度")]
-    public FloatParameter FogStartHeight = new FloatParameter(0f);
+    [Tooltip("模糊强度")]
+    public FloatParameter BlurStrength = new FloatParameter(1.0f);
 
-    [Tooltip("雾高度")]
-    public FloatParameter FogHeight = new FloatParameter(10f);
-
-    [Range(0, 1), Tooltip("雾强度")]
-    public FloatParameter FogIntensity = new FloatParameter(0.5f);
-
-    [Range(0, 1), Tooltip("雾颜色")]
-    public ColorParameter FogColor = new ColorParameter(Color.white);
+    [Tooltip("模糊权重")]
+    public Vector3Parameter BlurWeight = new Vector3Parameter(Vector3.one);
 
     public bool IsActive() => EnableEffect == true;
 

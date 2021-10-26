@@ -16,6 +16,7 @@ Shader "Universal Render Pipeline/Dejavu/MotionBlur"
         float4x4 _InverseVPMatrix;
         float4x4 _PreInverseVPMatrix;
         float _BlurStrength;
+        float3 _BlurWeight;
         CBUFFER_END
 
 
@@ -35,6 +36,7 @@ Shader "Universal Render Pipeline/Dejavu/MotionBlur"
             float4 positionCS : SV_POSITION;
             float2 uv : TEXCOORD0;
             float3 viewRayWorld : TEXCOORD1;
+            float3 viewRayWorldPre : TEXCOORD2;
             UNITY_VERTEX_OUTPUT_STEREO
         };
 
@@ -51,8 +53,12 @@ Shader "Universal Render Pipeline/Dejavu/MotionBlur"
             float4 ndc = float4(v.uv.x * 2 - 1, v.uv.y * 2 - 1, sceneRawDepth * 2 - 1, 1);
             float4 worldPos = mul(_InverseVPMatrix, ndc);
             worldPos /= worldPos.w;
-
             o.viewRayWorld = worldPos.xyz - _WorldSpaceCameraPos.xyz;
+
+            worldPos = mul(_PreInverseVPMatrix, ndc);
+            worldPos /= worldPos.w;
+            o.viewRayWorldPre = worldPos.xyz - _WorldSpaceCameraPos.xyz;
+
             o.uv = v.uv;
             return o;
         }
@@ -64,7 +70,17 @@ Shader "Universal Render Pipeline/Dejavu/MotionBlur"
             float sceneRawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, i.uv);
             float linear01Depth = Linear01Depth(sceneRawDepth, _ZBufferParams);
             float3 worldPos = _WorldSpaceCameraPos.xyz + (linear01Depth)*i.viewRayWorld;
-            return float4(worldPos, 1);
+
+            float3 worldPosPre = _WorldSpaceCameraPos.xyz + (linear01Depth)*i.viewRayWorldPre;
+
+            float2 velocity = (worldPos - worldPosPre).xy * _BlurStrength;
+            float4 screenTex = tex2D(_MainTex, i.uv);
+            screenTex += tex2D(_MainTex, i.uv + velocity * 1.0) * _BlurWeight.x;
+            screenTex += tex2D(_MainTex, i.uv + velocity * 2.0) * _BlurWeight.y;
+            screenTex += tex2D(_MainTex, i.uv + velocity * 3.0) * _BlurWeight.z;
+            screenTex /= (1.0 + _BlurWeight.x + _BlurWeight.y + _BlurWeight.z);
+ 
+            return screenTex;
             
         }
             ENDHLSL
