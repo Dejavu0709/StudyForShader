@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-3988176576833820602
+--- !u!114 &-8168843946438614681
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 02749b4f84e8dbe4796544695854e9a1, type: 3}
-  m_Name: NewDepthScanLineRenderFeature
+  m_Name: NewDepthScanRenderFeature
   m_EditorClassIdentifier: 
   m_Active: 1
 --- !u!114 &11400000
@@ -27,11 +27,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_RendererFeatures:
   - {fileID: 7847077368040297465}
-  - {fileID: -3988176576833820602}
   - {fileID: 6899644384769479409}
   - {fileID: 3793162840212869448}
   - {fileID: 7698596835598245554}
-  m_RendererFeatureMap: f9930c674a6be66c4668499c8826a7c8f112b4160376c05f489119928105a434b29ec77608e9d66a
+  - {fileID: -8168843946438614681}
+  m_RendererFeatureMap: f9930c674a6be66cf112b4160376c05f489119928105a434b29ec77608e9d66a6721ed0ab66fa28e
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
   shaders:

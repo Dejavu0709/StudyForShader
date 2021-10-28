@@ -1,5 +1,3 @@
-// see README here: 
-// github.com/ColinLeung-NiloCat/UnityURPUnlitScreenSpaceDecalShader
 
 Shader "Universal Render Pipeline/Dejavu/DepthScanLine"
 {
@@ -66,18 +64,8 @@ Shader "Universal Render Pipeline/Dejavu/DepthScanLine"
         //fragment shader
         float4 frag(v2f i) : SV_Target
         {
-            //float  sceneRawDepth2 = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);
-            //float sceneDepthVS2 = Linear01Depth(sceneRawDepth2, _ZBufferParams);
-
-             //float sceneRawDepth = tex2D(_CameraDepthTexture, i.uv).r;
-            // float sceneDepth = Linear01Depth(sceneRawDepth, _ZBufferParams);
-             //float sceneDepthVS2 = LinearEyeDepth(sceneRawDepth2, _ZBufferParams);
              float2 dir = i.uv - float2(0.5, 0.5);
-             //float2 offset = _DistortFactor * normalize(dir) * (1 - length(dir));
-             //float2 uv = i.uv - offset * sceneDepthVS2;
-            // float2 uv = i.uv - normalize(dir) * (1 - length(dir));
              float2 offset = _DistortFactor * dir * (1 - length(dir));
-             //float2 uv = i.uv - offset * sceneDepthVS2;
              float2 uv = i.uv - offset;
 
              float sceneRawDepth2 = tex2D(_CameraDepthTexture, uv).r;
@@ -85,7 +73,6 @@ Shader "Universal Render Pipeline/Dejavu/DepthScanLine"
 
 
              float4 screenCol = tex2D(_MainTex, uv);
-             //screenCol = half4( 100*sceneDepthVS2,0,0,1);
              if (sceneDepth2 * 20 > _ScanValue && sceneDepth2 * 20 < _ScanValue + _ScanLineWidth)
              {
                  return screenCol * _ScanLightStrength * _ScanLineColor;

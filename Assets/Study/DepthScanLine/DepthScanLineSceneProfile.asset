@@ -1,5 +1,49 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8688817183585456374
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c48cbffbf64cae4489e7cd37167a64c2, type: 3}
+  m_Name: DepthScanVolume
+  m_EditorClassIdentifier: 
+  active: 1
+  m_AdvancedMode: 0
+  enableEffect:
+    m_OverrideState: 1
+    m_Value: 1
+  enableScanCircleEffect:
+    m_OverrideState: 1
+    m_Value: 0
+  ScanLineWidth:
+    m_OverrideState: 1
+    m_Value: 0.18
+  ScanLightStrength:
+    m_OverrideState: 1
+    m_Value: 1.96
+  ScanLineColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.7490566, g: 0.8549821, b: 1, a: 1}
+    hdr: 0
+    showAlpha: 1
+    showEyeDropper: 1
+  ScanSpeed:
+    m_OverrideState: 1
+    m_Value: 0.19
+  DistortFactor:
+    m_OverrideState: 1
+    m_Value: 0.03
+  Center:
+    m_OverrideState: 1
+    m_Value: {x: 2, y: 0, z: -3.48}
+  Radius:
+    m_OverrideState: 1
+    m_Value: 9.7
 --- !u!114 &-7893295128165547882
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -111,6 +155,41 @@ MonoBehaviour:
   rounded:
     m_OverrideState: 0
     m_Value: 0
+--- !u!114 &-2229173412822203021
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: DepthScanVolume
+  m_EditorClassIdentifier: Assembly-CSharp::DepthScanVolume
+  active: 1
+  m_AdvancedMode: 0
+  enableEffect:
+    m_OverrideState: 1
+    m_Value: 1
+  enableScanCircleEffect:
+    m_OverrideState: 1
+    m_Value: 0
+  ScanLineWidth:
+    m_OverrideState: 1
+    m_Value: 0.02
+  ScanLightStrength:
+    m_OverrideState: 1
+    m_Value: 0.23
+  ScanLineColor:
+    m_OverrideState: 1
+    m_Value: {x: 1, y: 1, z: 5.52, w: 1}
+  ScanSpeed:
+    m_OverrideState: 1
+    m_Value: 0.34
+  DistortFactor:
+    m_OverrideState: 1
+    m_Value: 0.22
 --- !u!114 &-2099550515139450765
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -148,7 +227,7 @@ MonoBehaviour:
   - {fileID: 2458913213007515846}
   - {fileID: 4051564166732581847}
   - {fileID: 2644861381411716255}
-  - {fileID: 7142176056400296216}
+  - {fileID: -8688817183585456374}
 --- !u!114 &849379129802519247
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -278,6 +357,9 @@ MonoBehaviour:
   enableEffect:
     m_OverrideState: 1
     m_Value: 1
+  enableScanCircleEffect:
+    m_OverrideState: 0
+    m_Value: 0
   ScanLineWidth:
     m_OverrideState: 1
     m_Value: 0.02
@@ -286,10 +368,19 @@ MonoBehaviour:
     m_Value: 2.1
   ScanLineColor:
     m_OverrideState: 1
-    m_Value: {x: 0.76, y: 0.92, z: 8.15, w: 1}
+    m_Value: {r: 0, g: 1, b: 0, a: 1}
+    hdr: 0
+    showAlpha: 1
+    showEyeDropper: 1
   ScanSpeed:
     m_OverrideState: 1
     m_Value: 0.12
   DistortFactor:
     m_OverrideState: 1
     m_Value: 0
+  Center:
+    m_OverrideState: 0
+    m_Value: {x: 0, y: 0, z: 0}
+  Radius:
+    m_OverrideState: 0
+    m_Value: 20

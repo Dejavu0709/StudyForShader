@@ -2,13 +2,13 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-public class DepthScanLineRenderFeature : ScriptableRendererFeature
+public class DepthScanRenderFeature : ScriptableRendererFeature
 {
-    DepthScanLinePass pass;
+    DepthScanPass pass;
 
     public override void Create()
     {
-        pass = new DepthScanLinePass(RenderPassEvent.BeforeRenderingPostProcessing);
+        pass = new DepthScanPass(RenderPassEvent.BeforeRenderingPostProcessing);
     }
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
@@ -18,7 +18,7 @@ public class DepthScanLineRenderFeature : ScriptableRendererFeature
     }
 }
 
-public class DepthScanLinePass : ScriptableRenderPass
+public class DepthScanPass : ScriptableRenderPass
 {
     static readonly string k_RenderTag = "Render DepthScanLine Effects";
     static readonly int MainTexId = Shader.PropertyToID("_MainTex");
@@ -28,27 +28,41 @@ public class DepthScanLinePass : ScriptableRenderPass
     static readonly int ScanLightStrengthId = Shader.PropertyToID("_ScanLightStrength");
     static readonly int ScanValueId = Shader.PropertyToID("_ScanValue");
     static readonly int DistortFactorId = Shader.PropertyToID("_DistortFactor");
+    static readonly int CenterId = Shader.PropertyToID("_Center");
+    static readonly int RadiusId = Shader.PropertyToID("_Radius");
     static float scanValue = 0.5f;
 
-    DepthScanLineVolume depthScanLineVolume;
-    Material material;
+    DepthScanVolume depthScanVolume;
+    Material material1;
+    Material material2;
     RenderTargetIdentifier currentTarget;
 
-    public DepthScanLinePass(RenderPassEvent evt)
+    public DepthScanPass(RenderPassEvent evt)
     {
         renderPassEvent = evt;
-        var shader = Shader.Find("Universal Render Pipeline/Dejavu/DepthScanLine");
-        if (shader == null)
+        string shaderPath = "Universal Render Pipeline/Dejavu/DepthScanLine"; ;
+        var shader1 = Shader.Find(shaderPath);
+        if (shader1 == null)
         {
             Debug.LogError("Shader not found.");
             return;
         }
-        material = CoreUtils.CreateEngineMaterial(shader);
+        material1 = CoreUtils.CreateEngineMaterial(shader1);
+
+        shaderPath = "Universal Render Pipeline/Dejavu/WorldDepthScanCircle";
+        var shader2 = Shader.Find(shaderPath);
+        if (shader2 == null)
+        {
+            Debug.LogError("Shader not found.");
+            return;
+        }
+        material2 = CoreUtils.CreateEngineMaterial(shader2);
+
     }
 
     public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
     {
-        if (material == null)
+        if (material1 == null || material2 == null)
         {
             Debug.LogError("Material not created.");
             return;
@@ -57,9 +71,9 @@ public class DepthScanLinePass : ScriptableRenderPass
         if (!renderingData.cameraData.postProcessEnabled) return;
 
         var stack = VolumeManager.instance.stack;
-        depthScanLineVolume = stack.GetComponent<DepthScanLineVolume>();
-        if (depthScanLineVolume == null) { return; }
-        if (!depthScanLineVolume.IsActive()) { return; }
+        depthScanVolume = stack.GetComponent<DepthScanVolume>();
+        if (depthScanVolume == null) { return; }
+        if (!depthScanVolume.IsActive()) { return; }
         var cmd = CommandBufferPool.Get(k_RenderTag);
         Render(cmd, ref renderingData);
         context.ExecuteCommandBuffer(cmd);
@@ -79,18 +93,28 @@ public class DepthScanLinePass : ScriptableRenderPass
 
         var w = cameraData.camera.scaledPixelWidth;
         var h = cameraData.camera.scaledPixelHeight;
-        material.SetFloat(ScanLightStrengthId, depthScanLineVolume.ScanLightStrength.value);
-        material.SetFloat(ScanLineWidthId, depthScanLineVolume.ScanLineWidth.value);
-        material.SetVector(ScanLineColorId, depthScanLineVolume.ScanLineColor.value);
-
-        scanValue += 0.01f * depthScanLineVolume.ScanSpeed.value;
-        //限制一下最大值，最小值
-        //scanValue = Mathf.Min(0.95f, 1 - scanValue);
-        if (scanValue > 1.0f)
-            scanValue = 0.5f;
-        //Debug.Log("scanValue:" + scanValue);
-        material.SetFloat(DistortFactorId, depthScanLineVolume.DistortFactor.value * scanValue);
-        material.SetFloat(ScanValueId, 1 - scanValue);
+        Material material;
+        scanValue += 0.01f * depthScanVolume.ScanSpeed.value;
+        if(depthScanVolume.enableScanCircleEffect.value)
+        {
+            material = material2;
+            if (scanValue > 1.0f)
+                scanValue = 0.0f;
+            material2.SetVector(CenterId, depthScanVolume.Center.value);
+            material2.SetFloat(RadiusId, depthScanVolume.Radius.value);
+            material2.SetFloat(ScanValueId, scanValue);
+        }
+        else
+        {
+            material = material1;
+            if (scanValue > 1.0f)
+                scanValue = 0.5f;
+            material1.SetFloat(ScanValueId, 1 - scanValue);
+            material1.SetFloat(DistortFactorId, depthScanVolume.DistortFactor.value * scanValue);
+        }
+        material.SetFloat(ScanLightStrengthId, depthScanVolume.ScanLightStrength.value);
+        material.SetFloat(ScanLineWidthId, depthScanVolume.ScanLineWidth.value);
+        material.SetVector(ScanLineColorId, depthScanVolume.ScanLineColor.value);
         int shaderPass = 0;
         cmd.SetGlobalTexture(MainTexId, source);
         cmd.GetTemporaryRT(destination, w, h, 0, FilterMode.Point, RenderTextureFormat.Default);

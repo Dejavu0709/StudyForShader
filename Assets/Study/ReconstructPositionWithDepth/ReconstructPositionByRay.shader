@@ -36,8 +36,7 @@ Shader "Universal Render Pipeline/Dejavu/ReconstructPositionWithDepth/Reconstruc
     struct v2f {
         float4 positionCS : SV_POSITION;
         float2 uv : TEXCOORD0;
-        float3 viewRay : TEXCOORD1;
-        float3 viewRayWorld : TEXCOORD2;
+        float3 viewRayWorld : TEXCOORD1;
         UNITY_VERTEX_OUTPUT_STEREO
     };
 
