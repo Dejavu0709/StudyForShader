@@ -48,8 +48,7 @@ Shader "Universal Render Pipeline/Dejavu/HeightFog"
         UNITY_SETUP_INSTANCE_ID(v);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
         o.positionCS = TransformObjectToHClip(v.positionOS.xyz);
-        //·½·¨1
-        
+
         float sceneRawDepth = 1;
  #if defined(UNITY_REVERSED_Z)
         sceneRawDepth = 1 - sceneRawDepth;
