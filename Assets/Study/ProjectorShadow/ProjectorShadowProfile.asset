@@ -1,5 +1,28 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-4680317322155137953
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4020ad0c6b997fd45bc12afa3a6d2581, type: 3}
+  m_Name: ProjectorShadowVolume
+  m_EditorClassIdentifier: 
+  active: 1
+  m_AdvancedMode: 0
+  EnableEffect:
+    m_OverrideState: 1
+    m_Value: 1
+  BlurSize:
+    m_OverrideState: 1
+    m_Value: 2.9
+  BlurNum:
+    m_OverrideState: 1
+    m_Value: 5
 --- !u!114 &-3522712550543114735
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -70,13 +93,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d7fd9488000d3734a9e00ee676215985, type: 3}
-  m_Name: Post-process Volume Profile
+  m_Name: ProjectorShadowProfile
   m_EditorClassIdentifier: 
   components:
   - {fileID: 7439519013260191730}
   - {fileID: -1273992504491869169}
   - {fileID: 7022449572041519070}
   - {fileID: -3522712550543114735}
+  - {fileID: -4680317322155137953}
 --- !u!114 &7022449572041519070
 MonoBehaviour:
   m_ObjectHideFlags: 3

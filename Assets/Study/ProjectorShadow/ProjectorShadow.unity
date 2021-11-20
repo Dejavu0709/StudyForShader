@@ -279,7 +279,7 @@ GameObject:
   - component: {fileID: 1340124026}
   - component: {fileID: 1340124025}
   m_Layer: 6
-  m_Name: Sphere
+  m_Name: Sphere-ShadowMap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -378,7 +378,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1589737129
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -692,13 +692,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8abe0fdba01b06241b41c1f044713675, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CameraTrans:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
 --- !u!1 &2077018082
 GameObject:
   m_ObjectHideFlags: 0
@@ -712,7 +705,7 @@ GameObject:
   - component: {fileID: 2077018084}
   - component: {fileID: 2077018083}
   m_Layer: 6
-  m_Name: Sphere-ShadowMap
+  m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -868,7 +861,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 2.2e-44, y: 1.4546743e-37, z: 2.2e-44, w: 2.03125}
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
