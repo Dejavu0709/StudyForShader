@@ -177,7 +177,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9e0da86b3bb4ea4586185d72b0220b9, type: 3}
   m_Name: HeightFogVolume
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   m_AdvancedMode: 0
   EnableEffect:
     m_OverrideState: 1
@@ -231,21 +231,12 @@ MonoBehaviour:
   EnableEffect:
     m_OverrideState: 1
     m_Value: 1
-  FogStartHeight:
+  BlurStrength:
     m_OverrideState: 0
-    m_Value: 0
-  FogHeight:
+    m_Value: 1
+  BlurWeight:
     m_OverrideState: 0
-    m_Value: 10
-  FogIntensity:
-    m_OverrideState: 0
-    m_Value: 0.5
-  FogColor:
-    m_OverrideState: 0
-    m_Value: {r: 1, g: 1, b: 1, a: 1}
-    hdr: 0
-    showAlpha: 1
-    showEyeDropper: 1
+    m_Value: {x: 1, y: 1, z: 1}
 --- !u!114 &4362302505473125028
 MonoBehaviour:
   m_ObjectHideFlags: 3
